@@ -17,7 +17,7 @@ public class AuthActivity extends AppCompatActivity {
         setContentView(R.layout.activity_auth);
 
         TextView textWelcome = findViewById(R.id.text_welcome);
-        
+
 
     }
 }
