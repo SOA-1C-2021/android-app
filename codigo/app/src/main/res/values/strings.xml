@@ -1,4 +1,12 @@
 <resources>
-    <string name="app_name">app</string>
+    <string name="app_name">Activate</string>
+    <string name="auth_name">Autenticación</string>
+    <string name="login_name">Login</string>
+    <string name="register_name">Registro</string>
     <string name="text_welcome">¡Bienvenido! Por favor, ingrese el patrón de desbloqueo para comenzar.</string>
+    <string name="edit_text_user">Usuario</string>
+    <string name="edit_text_password">Password</string>
+    <string name="text_registration">Si aún no está registrado, puede hacerlo haciendo click en el siguiente botón</string>
+    <string name="button_login">Ingresar</string>
+    <string name="button_registration">Ir a registro</string>
 </resources>
