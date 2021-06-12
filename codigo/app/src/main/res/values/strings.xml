@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">app</string>
-    <string name="text_welcome">¡Bienvenido! Por favor, ingrese el patrón de desbloqueo para ingresar.</string>
+    <string name="text_welcome">¡Bienvenido! Por favor, ingrese el patrón de desbloqueo para comenzar.</string>
 </resources>
