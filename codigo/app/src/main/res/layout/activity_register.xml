@@ -55,14 +55,14 @@
             app:layout_constraintTop_toBottomOf="@+id/edit_text_last_name" />
 
         <EditText
-            android:id="@+id/edit_text_email"
+            android:id="@+id/edit_text_email_register"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="64dp"
             android:layout_marginTop="32dp"
             android:layout_marginEnd="64dp"
             android:ems="10"
-            android:hint="@string/edit_text_email"
+            android:hint="@string/edit_text_email_register"
             android:inputType="textEmailAddress"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -80,7 +80,7 @@
             android:inputType="textPassword"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit_text_email" />
+            app:layout_constraintTop_toBottomOf="@+id/edit_text_email_register" />
 
         <EditText
             android:id="@+id/edit_text_commission"

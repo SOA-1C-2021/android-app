@@ -4,7 +4,7 @@
     <string name="login_name">Ingresar</string>
     <string name="register_name">Crear usuario</string>
     <string name="text_welcome">¡Bienvenido! Por favor, ingrese el patrón de desbloqueo para comenzar.</string>
-    <string name="edit_text_user">Usuario</string>
+    <string name="edit_text_email_login">Usuario (email)</string>
     <string name="edit_text_password">Contraseña</string>
     <string name="text_registration">Si aún no tiene un usuario creado, puede crear uno pulsando el siguiente botón</string>
     <string name="button_login">Ingresar</string>
@@ -13,7 +13,7 @@
     <string name="edit_text_name">Nombre</string>
     <string name="edit_text_lastname">Apellido</string>
     <string name="edit_text_dni">DNI</string>
-    <string name="edit_text_email">Dirección de correo electrónico</string>
+    <string name="edit_text_email_register">Email</string>
     <string name="edit_text_new_password">Contraseña</string>
     <string name="edit_text_commission">Comisión</string>
     <string name="edit_text_group">Grupo</string>

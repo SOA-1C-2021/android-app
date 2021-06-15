@@ -13,7 +13,7 @@ public class RegisterRequest {
     public RegisterRequest() {
     }
 
-    // Getters
+    // getters
     public String getEnv() {
         return env;
     }
@@ -39,7 +39,7 @@ public class RegisterRequest {
         return group;
     }
 
-    // Setters
+    // setters
     public void setEnv(String env) {
         this.env = env;
     }

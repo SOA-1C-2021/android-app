@@ -18,12 +18,15 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+// TODO: hacer que el grupo y la comision sean sprinners con valores predeterminados
+// TODO: hacer que los labels sean flotantes
+
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText editTextName = null;
     private EditText editTextLastname = null;
     private EditText editTextDni = null;
-    private EditText editTextEmail = null;
+    private EditText editTextEmailRegister = null;
     private EditText editTextNewPassword = null;
     private EditText editTextCommission = null;
     private EditText editTextGroup = null;
@@ -35,10 +38,11 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         // reference ui components
+
         editTextName = findViewById(R.id.edit_text_name);
         editTextLastname = findViewById(R.id.edit_text_last_name);
         editTextDni = findViewById(R.id.edit_text_dni);
-        editTextEmail = findViewById(R.id.edit_text_email);
+        editTextEmailRegister = findViewById(R.id.edit_text_email_register);
         editTextNewPassword = findViewById(R.id.edit_text_new_password);
         editTextCommission = findViewById(R.id.edit_text_commission);
         editTextGroup = findViewById(R.id.edit_text_group);
@@ -57,7 +61,7 @@ public class RegisterActivity extends AppCompatActivity {
             String name = editTextName.getText().toString();
             String lastname = editTextLastname.getText().toString();
             String dni = editTextDni.getText().toString();
-            String email = editTextEmail.getText().toString();
+            String email = editTextEmailRegister.getText().toString();
             String newPassword = editTextNewPassword.getText().toString();
             String commission = editTextCommission.getText().toString();
             String group = editTextGroup.getText().toString();
@@ -79,20 +83,25 @@ public class RegisterActivity extends AppCompatActivity {
 
             // execute request
             UNLaMSOAAPIService service = UNLaMSOAAPIServiceBuilder.buildService(UNLaMSOAAPIService.class);
-            Call<RegisterResponse> call = service.createUser(registerRequest);
+            Call<RegisterResponse> call = service.register(registerRequest);
 
             call.enqueue(new Callback<RegisterResponse>() {
 
                 @Override
                 public void onResponse(Call<RegisterResponse> request, Response<RegisterResponse> response) {
-                    Toast.makeText(RegisterActivity.this, "Usuario creado." ,Toast.LENGTH_SHORT).show();
-                    finish();
+
+                    if (response.isSuccessful()) {
+                        Toast.makeText(RegisterActivity.this, "Usuario creado" ,Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        Toast.makeText(RegisterActivity.this, "Error al crear usuario, por favor verifique los valores ingresados e intente nuevamente" ,Toast.LENGTH_LONG).show();
+                    }
+
                 }
 
                 @Override
                 public void onFailure(Call<RegisterResponse> request, Throwable t) {
-                    Toast.makeText(RegisterActivity.this, "Error al crear usuario." ,Toast.LENGTH_SHORT).show();
-                    finish();
+                    Toast.makeText(RegisterActivity.this, "Error al crear usuario, por favor verifique los valores ingresados e intente nuevamente" ,Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -107,8 +116,9 @@ public class RegisterActivity extends AppCompatActivity {
         final int PASSWORD_MINIMUM_LENGTH = 8;
         final String EMPTY_FIELD_ERROR = "El campo no puede estar vacío";
         final String INVALID_DNI_ERROR = "El DNI ingresado es inválido";
-        final String INVALID_EMAIL_ERROR = "El e-mail ingresado es inválido";
+        final String INVALID_EMAIL_ERROR = "El email ingresado es inválido";
         final String INVALID_PASSWORD_ERROR = "El password debe tener un mínimo de 8 caracteres";
+        final String INVALID_COMMISSION_ERROR = "La comisión sólo puede tener los valores 2900 o 3900";
 
         if (name.isEmpty()) {
             editTextName.setError(EMPTY_FIELD_ERROR);
@@ -129,10 +139,10 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         if (email.isEmpty()) {
-            editTextEmail.setError(EMPTY_FIELD_ERROR);
+            editTextEmailRegister.setError(EMPTY_FIELD_ERROR);
             valid = false;
-        } else if (Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            editTextEmail.setError(INVALID_EMAIL_ERROR);
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            editTextEmailRegister.setError(INVALID_EMAIL_ERROR);
             valid = false;
         }
 
@@ -146,6 +156,9 @@ public class RegisterActivity extends AppCompatActivity {
 
         if (commission.isEmpty()) {
             editTextCommission.setError(EMPTY_FIELD_ERROR);
+            valid = false;
+        } else if (!commission.equals("2900") && !commission.equals("3900")) {
+            editTextCommission.setError(INVALID_COMMISSION_ERROR);
             valid = false;
         }
 
