@@ -21,7 +21,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/image_logo_auth" />
 
     <com.andrognito.patternlockview.PatternLockView
         android:id="@+id/pattern_lock_view"
@@ -36,7 +36,7 @@
         app:wrongStateColor="@color/red" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/image_logo_auth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"

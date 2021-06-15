@@ -17,4 +17,5 @@
     <string name="edit_text_new_password">Contraseña</string>
     <string name="edit_text_commission">Comisión</string>
     <string name="edit_text_group">Grupo</string>
+    <string name="env">TEST</string>
 </resources>
