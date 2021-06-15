@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 import com.soa.app.models.RegisterResponse;
 import com.soa.app.models.RegisterRequest;
+import com.soa.app.services.AppExecutors;
+import com.soa.app.services.NetworkConnectivity;
 import com.soa.app.services.UNLaMSOAAPIService;
 import com.soa.app.services.UNLaMSOAAPIServiceBuilder;
 
@@ -32,6 +34,8 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText editTextGroup = null;
     private Button buttonRegister = null;
 
+    private NetworkConnectivity networkConnectivity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +54,9 @@ public class RegisterActivity extends AppCompatActivity {
 
         // add listeners
         buttonRegister.setOnClickListener(buttonRegisterListener);
+
+        // instantiate network connectivity checker class
+        networkConnectivity = new NetworkConnectivity(AppExecutors.getInstance(), this);
     }
 
     private View.OnClickListener buttonRegisterListener = new View.OnClickListener()
@@ -57,51 +64,11 @@ public class RegisterActivity extends AppCompatActivity {
 
         public void onClick(View v) {
 
-            // get values
-            String name = editTextName.getText().toString();
-            String lastname = editTextLastname.getText().toString();
-            String dni = editTextDni.getText().toString();
-            String email = editTextEmailRegister.getText().toString();
-            String newPassword = editTextNewPassword.getText().toString();
-            String commission = editTextCommission.getText().toString();
-            String group = editTextGroup.getText().toString();
-
-            // validate
-            boolean validInputs = validateInputs(name, lastname, dni, email, newPassword, commission, group);
-            if (!validInputs) return;
-
-            // build request
-            RegisterRequest registerRequest = new RegisterRequest();
-            registerRequest.setEnv(getString(R.string.env));
-            registerRequest.setName(name);
-            registerRequest.setLastname(lastname);
-            registerRequest.setDni(Integer.parseInt(dni));
-            registerRequest.setEmail(email);
-            registerRequest.setPassword(newPassword);
-            registerRequest.setCommission(Integer.parseInt(commission));
-            registerRequest.setGroup(Integer.parseInt(group));
-
-            // execute request
-            UNLaMSOAAPIService service = UNLaMSOAAPIServiceBuilder.buildService(UNLaMSOAAPIService.class);
-            Call<RegisterResponse> call = service.register(registerRequest);
-
-            call.enqueue(new Callback<RegisterResponse>() {
-
-                @Override
-                public void onResponse(Call<RegisterResponse> request, Response<RegisterResponse> response) {
-
-                    if (response.isSuccessful()) {
-                        Toast.makeText(RegisterActivity.this, "Usuario creado" ,Toast.LENGTH_SHORT).show();
-                        finish();
-                    } else {
-                        Toast.makeText(RegisterActivity.this, "Error al crear usuario, por favor verifique los valores ingresados e intente nuevamente" ,Toast.LENGTH_LONG).show();
-                    }
-
-                }
-
-                @Override
-                public void onFailure(Call<RegisterResponse> request, Throwable t) {
-                    Toast.makeText(RegisterActivity.this, "Error al crear usuario, por favor verifique los valores ingresados e intente nuevamente" ,Toast.LENGTH_LONG).show();
+            networkConnectivity.checkInternetConnection((isConnected) -> {
+                if (isConnected) {
+                    register();
+                } else {
+                    Toast.makeText(RegisterActivity.this, "El dispositivo no puede conectarse a Internet, por favor revise la configuración de red", Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -168,5 +135,56 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         return valid;
+    }
+
+    private void register() {
+
+        // get values
+        String name = editTextName.getText().toString();
+        String lastname = editTextLastname.getText().toString();
+        String dni = editTextDni.getText().toString();
+        String email = editTextEmailRegister.getText().toString();
+        String newPassword = editTextNewPassword.getText().toString();
+        String commission = editTextCommission.getText().toString();
+        String group = editTextGroup.getText().toString();
+
+        // validate
+        boolean validInputs = validateInputs(name, lastname, dni, email, newPassword, commission, group);
+        if (!validInputs) return;
+
+        // build request
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setEnv(getString(R.string.env));
+        registerRequest.setName(name);
+        registerRequest.setLastname(lastname);
+        registerRequest.setDni(Integer.parseInt(dni));
+        registerRequest.setEmail(email);
+        registerRequest.setPassword(newPassword);
+        registerRequest.setCommission(Integer.parseInt(commission));
+        registerRequest.setGroup(Integer.parseInt(group));
+
+        // execute request
+        UNLaMSOAAPIService service = UNLaMSOAAPIServiceBuilder.buildService(UNLaMSOAAPIService.class);
+        Call<RegisterResponse> call = service.register(registerRequest);
+
+        call.enqueue(new Callback<RegisterResponse>() {
+
+            @Override
+            public void onResponse(Call<RegisterResponse> request, Response<RegisterResponse> response) {
+
+                if (response.isSuccessful()) {
+                    Toast.makeText(RegisterActivity.this, "Usuario creado" ,Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Toast.makeText(RegisterActivity.this, "Error al crear usuario, por favor verifique los valores ingresados e intente nuevamente" ,Toast.LENGTH_LONG).show();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<RegisterResponse> request, Throwable t) {
+                Toast.makeText(RegisterActivity.this, "Error al crear usuario, por favor verifique los valores ingresados e intente nuevamente" ,Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
