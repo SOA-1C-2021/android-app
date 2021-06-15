@@ -14,6 +14,8 @@ import com.soa.app.models.LoginRequest;
 import com.soa.app.models.LoginResponse;
 import com.soa.app.models.RegisterRequest;
 import com.soa.app.models.RegisterResponse;
+import com.soa.app.services.AppExecutors;
+import com.soa.app.services.NetworkConnectivity;
 import com.soa.app.services.UNLaMSOAAPIService;
 import com.soa.app.services.UNLaMSOAAPIServiceBuilder;
 
@@ -27,6 +29,8 @@ public class LoginActivity extends AppCompatActivity {
     private EditText editTextPassword = null;
     private Button buttonLogin = null;
     private Button buttonRegistration = null;
+
+    private NetworkConnectivity networkConnectivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,56 +47,25 @@ public class LoginActivity extends AppCompatActivity {
         buttonLogin.setOnClickListener(buttonLoginListener);
         buttonRegistration.setOnClickListener(buttonRegistrationListener);
 
+        // instantiate network connectivity checker class
+        networkConnectivity = new NetworkConnectivity(AppExecutors.getInstance(), this);
+
     }
 
-    private View.OnClickListener buttonLoginListener = new View.OnClickListener()
-    {
+    private View.OnClickListener buttonLoginListener = new View.OnClickListener() {
         public void onClick(View v) {
 
-            // get values
-            String email = editTextEmailLogin.getText().toString();
-            String password = editTextPassword.getText().toString();
-
-            // validate
-            boolean validInputs = validateInputs(email, password);
-            if (!validInputs) return;
-
-            // build request
-            LoginRequest loginRequest = new LoginRequest();
-            loginRequest.setEmail(email);
-            loginRequest.setPassword(password);
-
-            // execute request
-            UNLaMSOAAPIService service = UNLaMSOAAPIServiceBuilder.buildService(UNLaMSOAAPIService.class);
-            Call<LoginResponse> call = service.login(loginRequest);
-
-            call.enqueue(new Callback<LoginResponse>() {
-
-                @Override
-                public void onResponse(Call<LoginResponse> request, Response<LoginResponse> response) {
-
-                    if (response.isSuccessful()) {
-                        Toast.makeText(LoginActivity.this, "Login exitoso" ,Toast.LENGTH_SHORT).show();
-                        Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(mainActivityIntent);
-                    } else {
-                        Toast.makeText(LoginActivity.this, "Error, por favor verifique que el usuario y la contraseña ingresadas sean correctas" ,Toast.LENGTH_LONG).show();
-                    }
-
-                }
-
-                @Override
-                public void onFailure(Call<LoginResponse> request, Throwable t) {
-                    Toast.makeText(LoginActivity.this, "Error, por favor verifique que el usuario y la contraseña ingresadas sean correctas" ,Toast.LENGTH_LONG).show();
+            networkConnectivity.checkInternetConnection((isConnected) -> {
+                if (isConnected) {
+                    login();
+                } else {
+                    Toast.makeText(LoginActivity.this, "El dispositivo no puede conectarse a Internet, por favor revise la configuración de red", Toast.LENGTH_LONG).show();
                 }
             });
-
         }
-
     };
 
-    private View.OnClickListener buttonRegistrationListener = new View.OnClickListener()
-    {
+    private View.OnClickListener buttonRegistrationListener = new View.OnClickListener() {
         public void onClick(View v) {
             Intent registerActivityIntent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(registerActivityIntent);
@@ -124,7 +97,48 @@ public class LoginActivity extends AppCompatActivity {
             valid = false;
         }
 
-
         return valid;
+    }
+
+    private void login() {
+
+        // get values
+        String email = editTextEmailLogin.getText().toString();
+        String password = editTextPassword.getText().toString();
+
+        // validate
+        boolean validInputs = validateInputs(email, password);
+        if (!validInputs) return;
+
+        // build request
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail(email);
+        loginRequest.setPassword(password);
+
+        // execute request
+        UNLaMSOAAPIService service = UNLaMSOAAPIServiceBuilder.buildService(UNLaMSOAAPIService.class);
+        Call<LoginResponse> call = service.login(loginRequest);
+
+        call.enqueue(new Callback<LoginResponse>() {
+
+            @Override
+            public void onResponse(Call<LoginResponse> request, Response<LoginResponse> response) {
+
+                if (response.isSuccessful()) {
+                    Toast.makeText(LoginActivity.this, "Login exitoso", Toast.LENGTH_SHORT).show();
+                    Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(mainActivityIntent);
+                } else {
+                        Toast.makeText(LoginActivity.this, "Error, por favor verifique que el usuario y la contraseña ingresadas sean correctas" ,Toast.LENGTH_LONG).show();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<LoginResponse> request, Throwable t) {
+                Toast.makeText(LoginActivity.this, "Error, por favor verifique que el usuario y la contraseña ingresadas sean correctas", Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 }
