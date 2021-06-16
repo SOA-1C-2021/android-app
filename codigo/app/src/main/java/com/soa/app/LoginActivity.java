@@ -12,8 +12,6 @@ import android.widget.Toast;
 
 import com.soa.app.models.LoginRequest;
 import com.soa.app.models.LoginResponse;
-import com.soa.app.models.RegisterRequest;
-import com.soa.app.models.RegisterResponse;
 import com.soa.app.services.AppExecutors;
 import com.soa.app.services.NetworkConnectivity;
 import com.soa.app.services.UNLaMSOAAPIService;
@@ -52,25 +50,24 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    private View.OnClickListener buttonLoginListener = new View.OnClickListener() {
-        public void onClick(View v) {
-
-            networkConnectivity.checkInternetConnection((isConnected) -> {
-                if (isConnected) {
-                    login();
-                } else {
-                    Toast.makeText(LoginActivity.this, "El dispositivo no puede conectarse a Internet, por favor revise la configuración de red", Toast.LENGTH_LONG).show();
-                }
-            });
+    private View.OnClickListener buttonLoginListener =  v -> {
+        if (getString(R.string.env).equals("TEST")) {
+            Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(mainActivityIntent);
+            return;
         }
+        networkConnectivity.checkInternetConnection((isConnected) -> {
+            if (isConnected) {
+                login();
+            } else {
+                Toast.makeText(LoginActivity.this, "El dispositivo no puede conectarse a Internet, por favor revise la configuración de red", Toast.LENGTH_LONG).show();
+            }
+        });
     };
 
-    private View.OnClickListener buttonRegistrationListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            Intent registerActivityIntent = new Intent(LoginActivity.this, RegisterActivity.class);
-            startActivity(registerActivityIntent);
-        }
-
+    private View.OnClickListener buttonRegistrationListener = v -> {
+        Intent registerActivityIntent = new Intent(LoginActivity.this, RegisterActivity.class);
+        startActivity(registerActivityIntent);
     };
 
     private boolean validateInputs(String email, String password) {

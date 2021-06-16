@@ -20,4 +20,6 @@
     <string name="env">TEST</string>
     <string name="text_goal_label">Mi meta de hoy</string>
     <string name="text_progress_label">Porcentaje completado</string>
+    <string name="settings">Configuración</string>
+    <string name="history">Historial</string>
 </resources>

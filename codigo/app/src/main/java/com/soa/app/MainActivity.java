@@ -11,6 +11,10 @@ import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.Intent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 
@@ -62,4 +66,37 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onAccuracyChanged(Sensor sensor, int i) {
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        int id = item.getItemId();
+        if (id == R.id.history) {
+            showHistory();
+            return true;
+        } else if (id == R.id.settings) {
+            showSettings();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void showHistory() {
+        Intent historyActivityIntent = new Intent(MainActivity.this, HistoryActivity.class);
+        startActivity(historyActivityIntent);
+    }
+
+    private void showSettings() {
+        Intent settingsActivityIntent = new Intent(MainActivity.this, SettingsActivity.class);
+        startActivity(settingsActivityIntent);
+    }
+
 }
