@@ -129,7 +129,7 @@ public class LoginActivity extends AppCompatActivity {
                     Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(mainActivityIntent);
                 } else {
-                        Toast.makeText(LoginActivity.this, "Error, por favor verifique que el usuario y la contraseña ingresadas sean correctas" ,Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, "Error, por favor verifique que el usuario y la contraseña ingresadas sean correctas" ,Toast.LENGTH_LONG).show();
                 }
 
             }
