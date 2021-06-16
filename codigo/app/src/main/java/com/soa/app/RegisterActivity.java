@@ -20,7 +20,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-// TODO: hacer que el grupo y la comision sean sprinners con valores predeterminados
+// TODO: hacer que el grupo y la comision sean spinners con valores predeterminados
 // TODO: hacer que los labels sean flotantes
 
 public class RegisterActivity extends AppCompatActivity {

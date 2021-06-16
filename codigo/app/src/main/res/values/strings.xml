@@ -18,4 +18,6 @@
     <string name="edit_text_commission">Comisión</string>
     <string name="edit_text_group">Grupo</string>
     <string name="env">TEST</string>
+    <string name="text_goal_label">Mi meta de hoy</string>
+    <string name="text_progress_label">Porcentaje completado</string>
 </resources>
