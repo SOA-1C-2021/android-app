@@ -50,7 +50,7 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    private View.OnClickListener buttonLoginListener =  v -> {
+    private final View.OnClickListener buttonLoginListener = v -> {
         if (getString(R.string.env).equals("TEST")) {
             Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(mainActivityIntent);
@@ -65,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     };
 
-    private View.OnClickListener buttonRegistrationListener = v -> {
+    private final View.OnClickListener buttonRegistrationListener = v -> {
         Intent registerActivityIntent = new Intent(LoginActivity.this, RegisterActivity.class);
         startActivity(registerActivityIntent);
     };
