@@ -22,4 +22,9 @@
     <string name="text_progress_label">Porcentaje completado</string>
     <string name="settings">Configuración</string>
     <string name="history">Historial</string>
+    <string name="text_view_goal">Mi meta diaria</string>
+    <string name="edit_text_goal_hint">Escribe un numero</string>
+    <string name="settings_step_goal_key">GOAL</string>
+    <string name="settings_file_key">com.soa.app.settings</string>
+    <string name="settings_save">Guardar</string>
 </resources>
