@@ -51,11 +51,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private final View.OnClickListener buttonLoginListener = v -> {
-        if (getString(R.string.env).equals("TEST")) {
-            Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(mainActivityIntent);
-            return;
-        }
         networkConnectivity.checkInternetConnection((isConnected) -> {
             if (isConnected) {
                 login();
@@ -98,6 +93,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void login() {
+        // No hacemos login en ambiente de TEST
+        if (getString(R.string.env).equals("TEST")) {
+            Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(mainActivityIntent);
+            finish(); // No volvemos al login desde el boton back
+            return;
+        }
 
         // get values
         String email = editTextEmailLogin.getText().toString();
@@ -125,6 +127,7 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Login exitoso", Toast.LENGTH_SHORT).show();
                     Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(mainActivityIntent);
+                    finish(); // No volvemos al login desde el boton back
                 } else {
                     Toast.makeText(LoginActivity.this, "Error, por favor verifique que el usuario y la contraseña ingresadas sean correctas" ,Toast.LENGTH_LONG).show();
                 }

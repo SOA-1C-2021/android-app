@@ -61,14 +61,14 @@ public class SettingsActivity extends AppCompatActivity {
 
    @Override
     protected void onResume() {
-        start();
         super.onResume();
+        start();
     }
 
     @Override
     protected void onPause() {
-        stop();
         super.onPause();
+        stop();
     }
 
     private final View.OnClickListener buttonClickListener = v -> {
@@ -78,6 +78,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         // refresco el edit
         editTextGoal.setText(String.format("%s", goal));
+        finish();
     };
 
     private final SensorEventListener sensorEventListener = new SensorEventListener() {

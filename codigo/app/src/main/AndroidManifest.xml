@@ -18,20 +18,26 @@
         android:theme="@style/Theme.App">
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/settings" />
+            android:label="@string/settings"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".HistoryActivity"
             android:label="@string/history"/>
-        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".RegisterActivity"
-            android:label="@string/register_name" />
+            android:label="@string/register_name"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".LoginActivity"
-            android:label="@string/login_name" />
+            android:label="@string/login_name"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".AuthActivity"
-            android:label="@string/auth_name">
+            android:label="@string/auth_name"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

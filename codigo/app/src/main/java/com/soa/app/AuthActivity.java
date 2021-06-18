@@ -66,6 +66,7 @@ public class AuthActivity extends AppCompatActivity {
                 patternLockView.setCorrectStateColor(ResourceUtils.getColor(AuthActivity.this, R.color.green));
                 Intent loginActivityIntent = new Intent(AuthActivity.this, LoginActivity.class);
                 startActivity(loginActivityIntent);
+                finish(); // No volvemos al patron desde el boton back
             } else {
                 Log.d(getClass().getName(), "Incorrect pattern entered");
                 patternLockView.setCorrectStateColor(ResourceUtils.getColor(AuthActivity.this, R.color.red));

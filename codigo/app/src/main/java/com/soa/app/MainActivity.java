@@ -7,7 +7,6 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SyncStatusObserver;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -17,9 +16,6 @@ import android.hardware.TriggerEvent;
 import android.hardware.TriggerEventListener;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.content.Intent;
@@ -29,10 +25,10 @@ import android.view.MenuItem;
 
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity {
     // Vista
+    private TextView textDailyGoal = null;
+    private TextView textCurrentCount = null;
     private TextView textProgressValue = null;
     CircularProgressBar circularProgressBar = null;
 
@@ -42,9 +38,7 @@ public class MainActivity extends AppCompatActivity {
     // Sensor
     SensorManager sensorManager;
     Sensor sensor;
-    private boolean sensorActive = false;
     private int steps = 0;
-    private int goal = 0;
     private final int  REQ_CODE_ACTIVITY_RECOGNITION = 0;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -54,25 +48,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // reference ui components
+        textDailyGoal = findViewById(R.id.text_goal_value);
+        textCurrentCount = findViewById(R.id.text_current_count);
         circularProgressBar = findViewById(R.id.circular_progress_bar);
         textProgressValue = findViewById(R.id.text_progress_value);
 
         // shared preferences
         sharedPref = this.getSharedPreferences(getString(R.string.settings_file_key),  Context.MODE_PRIVATE);
 
-        goal = readPrefferenceInt(sharedPref, getString(R.string.settings_step_goal_key),
-                getResources().getInteger(R.integer.settings_step_goal));
-        steps = readPrefferenceInt(sharedPref, getString(R.string.current_step_count_key),
-                getResources().getInteger(R.integer.current_step_count));
-
-        circularProgressBar.setProgressMax(goal);
-        circularProgressBar.setProgress(steps);
-        textProgressValue.setText(String.format("%d / %d", steps, goal));
-
-        // solicito permisos (api 29 o posterior)
         if(ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_DENIED){
-            requestPermissions(new String[]{Manifest.permission.ACTIVITY_RECOGNITION}, REQ_CODE_ACTIVITY_RECOGNITION);
+            // solicito permisos (api 29 o posterior)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                requestPermissions(new String[]{Manifest.permission.ACTIVITY_RECOGNITION}, REQ_CODE_ACTIVITY_RECOGNITION);
+            }
         }
 
         // inentamos instanciar el sensor detector de pasos
@@ -94,12 +83,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // actualizo la vista
+        updateUI();
+        // inicio los sensores
         start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        // detengo los sensores
         stop();
     }
 
@@ -129,11 +122,10 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onSensorChanged(SensorEvent sensorEvent) {
             steps += sensorEvent.values[0];
-            circularProgressBar.setProgress(steps);
-            textProgressValue.setText(String.format("%d / %d", steps, goal));
-
             // guardo la cuenta actual
             savePrefferenceInt(sharedPref, getString(R.string.current_step_count_key), steps);
+            // actualizo la vista
+            updateUI();
         }
 
         @Override
@@ -144,11 +136,10 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onTrigger(TriggerEvent sensorEvent) {
             steps += sensorEvent.values[0];
-            circularProgressBar.setProgress(steps);
-            textProgressValue.setText(String.format("%d / %d", steps, goal));
-
-            // guardo la configuración
+            // guardo la cuenta actual
             savePrefferenceInt(sharedPref, getString(R.string.current_step_count_key), steps);
+            // actualizo la vista
+            updateUI();
 
             // El sensor de movimiento significativo, dispara un evento
             // y se "duerme", entonces lo volvemos a "despertar"
@@ -167,12 +158,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void start() {
-        sensorManager.registerListener(sensorEventListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManager.requestTriggerSensor(triggerEventListener, sensor);
+        if (sensor != null) {
+            switch (sensor.getType()) {
+                case Sensor.TYPE_STEP_DETECTOR: {
+                    sensorManager.registerListener(sensorEventListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+                    break;
+                }
+                case Sensor.TYPE_SIGNIFICANT_MOTION: {
+                    sensorManager.requestTriggerSensor(triggerEventListener, sensor);
+                }
+                default:
+                    break;
+            }
+        }
     }
 
     private void stop() {
-        sensorManager.registerListener(sensorEventListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+        if (sensor != null) {
+            switch (sensor.getType()) {
+                case Sensor.TYPE_STEP_DETECTOR: {
+                    sensorManager.unregisterListener(sensorEventListener, sensor);
+                    break;
+                }
+                case Sensor.TYPE_SIGNIFICANT_MOTION: {
+                    sensorManager.cancelTriggerSensor(triggerEventListener, sensor);
+                }
+                default:
+                    break;
+            }
+        }
     }
 
     private int readPrefferenceInt(SharedPreferences sharedPref, String key, int defaultValue) {
@@ -188,5 +202,18 @@ public class MainActivity extends AppCompatActivity {
             editor.putInt(key, value);
             editor.apply();
         }
+    }
+
+    private void updateUI() {
+        int goal = readPrefferenceInt(sharedPref, getString(R.string.settings_step_goal_key),
+                getResources().getInteger(R.integer.settings_step_goal));
+        steps = readPrefferenceInt(sharedPref, getString(R.string.current_step_count_key),
+                getResources().getInteger(R.integer.current_step_count));
+
+        textDailyGoal.setText(String.format("%d", goal));
+        textCurrentCount.setText(String.format("%d", steps));
+        textProgressValue.setText(String.format("%%%d", Math.round(((float) steps/goal) * 100)));
+        circularProgressBar.setProgressMax(goal);
+        circularProgressBar.setProgress(steps);
     }
 }
