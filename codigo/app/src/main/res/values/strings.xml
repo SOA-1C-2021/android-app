@@ -27,4 +27,5 @@
     <string name="settings_step_goal_key">GOAL</string>
     <string name="settings_file_key">com.soa.app.settings</string>
     <string name="settings_save">Guardar</string>
+    <string name="current_step_count_key">current_step_count</string>
 </resources>

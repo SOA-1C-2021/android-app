@@ -45,7 +45,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         int goal = readPrefferenceInt(sharedPref, getString(R.string.settings_step_goal_key),
                 getResources().getInteger(R.integer.settings_step_goal));
-        editTextGoal.setText(String.format("%s", goal));
+        editTextGoal.setText(String.format("%d", goal));
 
         // Sensor
         sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
@@ -57,9 +57,6 @@ public class SettingsActivity extends AppCompatActivity {
                 Toast.LENGTH_LONG
             ).show();
         }
-
-        // inicio el ascelerometro
-        start();
     }
 
    @Override
@@ -122,5 +119,4 @@ public class SettingsActivity extends AppCompatActivity {
             editor.apply();
         }
     }
-
 }
