@@ -14,8 +14,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.TriggerEvent;
 import android.hardware.TriggerEventListener;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.content.Intent;
@@ -23,7 +25,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.google.gson.JsonObject;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
     // Vista
@@ -40,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
     Sensor sensor;
     private int steps = 0;
     private final int  REQ_CODE_ACTIVITY_RECOGNITION = 0;
+
+    // Proceso en background
+    ThreadAsyncTask eventTask;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -96,6 +108,11 @@ public class MainActivity extends AppCompatActivity {
         stop();
     }
 
+    @Override
+    protected void onDestroy() {
+        eventTask.cancel(true);
+        super.onDestroy();
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -210,10 +227,70 @@ public class MainActivity extends AppCompatActivity {
         steps = readPrefferenceInt(sharedPref, getString(R.string.current_step_count_key),
                 getResources().getInteger(R.integer.current_step_count));
 
+        if (steps == goal) {
+            launchThread();
+        }
+
         textDailyGoal.setText(String.format("%d", goal));
         textCurrentCount.setText(String.format("%d", steps));
         textProgressValue.setText(String.format("%%%d", Math.round(((float) steps/goal) * 100)));
         circularProgressBar.setProgressMax(goal);
         circularProgressBar.setProgress(steps);
+    }
+
+    private void launchThread() {
+        eventTask = new ThreadAsyncTask();
+        eventTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    // Proceso en background
+    @SuppressWarnings("rawtypes")
+    private class ThreadAsyncTask extends AsyncTask  {
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            // Hilo secundario!
+            // En este caso usamos un ecanismo de request
+            // sincronico para justificar el uso de AsyncTask
+            JsonObject obj = new JsonObject();
+            obj.addProperty("env", "TEST");
+            obj.addProperty("type_events", "dayly_goal_reached");
+            obj.addProperty("description", "Meta de pasos alcanzada!!");
+            try {
+                URL url = new URL("http://so-unlam.net.ar/api/api/event");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                try {
+                    urlConnection.setRequestMethod("POST");
+                    urlConnection.setRequestProperty("Content-Type", "application/json");
+                    urlConnection.setRequestProperty("Authorization", "Bearer " + getToken());
+                    String body = obj.toString();
+                    OutputStream out = urlConnection.getOutputStream();
+                    out.write(body.getBytes());
+                    out.flush();
+                    int responseCode = urlConnection.getResponseCode();
+                    publishProgress(responseCode);
+                } finally {
+                    urlConnection.disconnect();
+                }
+            } catch (MalformedURLException e) {
+                Log.d("asdasds", "adsdasd");
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Object[] values) {
+            if ((int)values[0] == 200) {
+                Toast.makeText(MainActivity.this, "Meta completada!! Tu logro se ha enviado al servidor!!", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(MainActivity.this, "Meta completada!! Tu logro no pudo enviarse al servidor :(", Toast.LENGTH_LONG).show();
+            }
+        }
+
+        private String getToken() {
+            return "FAKE-TOKEN";
+        }
     }
 }
