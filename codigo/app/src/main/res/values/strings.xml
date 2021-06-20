@@ -30,4 +30,8 @@
     <string name="settings_save">Guardar</string>
     <string name="shared_preferences_history">com.soa.app.history</string>
     <string name="shared_preferences_settings">com.soa.app.settings</string>
+    <string name="text_date">FECHA</string>
+    <string name="text_steps">PASOS</string>
+    <string name="text_goal">META</string>
+    <string name="text_completed">COMPLETA</string>
 </resources>
