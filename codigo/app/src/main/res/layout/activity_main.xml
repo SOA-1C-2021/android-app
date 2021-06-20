@@ -21,16 +21,18 @@
         app:cpb_round_border="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_progress_label" />
+        app:layout_constraintTop_toBottomOf="@+id/text_percentage_label" />
 
     <TextView
         android:id="@+id/text_goal_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
-        android:text="TextView"
+        android:text="@string/text_goal_label"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -40,21 +42,53 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="32dp"
         android:text="TextView"
+        android:textColor="@color/teal_200"
+        android:textSize="34sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_goal_label" />
+
+    <TextView
+        android:id="@+id/text_percentage_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:text="@string/text_percentage_label"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_progress_value" />
+
+    <TextView
+        android:id="@+id/text_percentage_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textColor="@color/teal_200"
+        android:textSize="34sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/circular_progress_bar"
+        app:layout_constraintEnd_toEndOf="@+id/circular_progress_bar"
+        app:layout_constraintStart_toStartOf="@+id/circular_progress_bar"
+        app:layout_constraintTop_toTopOf="@+id/circular_progress_bar" />
 
     <TextView
         android:id="@+id/text_progress_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="128dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
-        android:text="TextView"
+        android:text="@string/text_progress_label"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_goal_value" />
@@ -63,10 +97,15 @@
         android:id="@+id/text_progress_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
         android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="@+id/circular_progress_bar"
-        app:layout_constraintEnd_toEndOf="@+id/circular_progress_bar"
-        app:layout_constraintStart_toStartOf="@+id/circular_progress_bar"
-        app:layout_constraintTop_toTopOf="@+id/circular_progress_bar" />
+        android:textColor="@color/teal_200"
+        android:textSize="34sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_progress_label" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

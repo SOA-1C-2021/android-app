@@ -9,78 +9,109 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 
 public class SettingsActivity extends AppCompatActivity {
-    // Vista
+    // view
     private EditText editTextGoal = null;
     private TextView textViewHiddenLabel = null;
+    private Button btnSaveSettings = null;
 
-    // Shared Prefferences
-    SharedPreferences sharedPref;
+    // Shared Preferences
+    SharedPreferences historySharedPreferences = null;
+    SharedPreferences settingsSharedPreferences = null;
 
     // Sensor
     SensorManager sensorManager;
     Sensor sensor;
+
+    // other
+    SimpleDateFormat simpleDateFormat = null;
+    private final int DEFAULT_DAILY_GOAL = 500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        // Vista
+        // reference ui components
         editTextGoal = findViewById(R.id.edit_text_goal);
         textViewHiddenLabel = findViewById(R.id.hidden_label);
         textViewHiddenLabel.setVisibility(View.INVISIBLE);
-        Button btnSaveSettings = findViewById(R.id.button_save_settings);
+        btnSaveSettings = findViewById(R.id.button_save_settings);
+
+        // instantiate sensor manager
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+        // instantiate date formatter
+        simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+
+        // instantiate shared preferences files
+        historySharedPreferences = getSharedPreferences(getString(R.string.shared_preferences_history), Context.MODE_PRIVATE);
+        settingsSharedPreferences = getSharedPreferences(getString(R.string.shared_preferences_settings), Context.MODE_PRIVATE);
+
+        // add listeners
         btnSaveSettings.setOnClickListener(buttonClickListener);
 
-        // Shared Prefferences
-        sharedPref = this.getSharedPreferences(getString(R.string.settings_file_key),  Context.MODE_PRIVATE);
-
-        int goal = readPrefferenceInt(sharedPref, getString(R.string.settings_step_goal_key),
-                getResources().getInteger(R.integer.settings_step_goal));
-        editTextGoal.setText(String.format("%s", goal));
-
-        // Sensor
-        sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        if(sensor == null) {
-            Toast.makeText(
-                SettingsActivity.this,
-                "El dispositivo no cuenta con acelerómetro",
-                Toast.LENGTH_LONG
-            ).show();
-        }
-
-        // inicio el ascelerometro
-        start();
+        // perform initialization actions
+        initializeUi();
     }
 
    @Override
     protected void onResume() {
-        start();
         super.onResume();
-    }
 
-    @Override
-    protected void onPause() {
-        stop();
-        super.onPause();
+       sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+       if (sensor == null) {
+           Toast.makeText(SettingsActivity.this, "El dispositivo no cuenta con acelerómetro", Toast.LENGTH_LONG).show();
+       } else {
+           sensorManager.registerListener(sensorEventListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+       }
     }
 
     private final View.OnClickListener buttonClickListener = v -> {
-        // guardo la configuración
-        int goal = Integer.parseInt(editTextGoal.getText().toString());
-        savePrefferenceInt(sharedPref, getString(R.string.settings_step_goal_key), goal);
 
-        // refresco el edit
-        editTextGoal.setText(String.format("%s", goal));
+        final String EMPTY_FIELD_ERROR = "El campo no puede estar vacío";
+
+        String goal = editTextGoal.getText().toString();
+        if (goal.isEmpty()) {
+            editTextGoal.setError(EMPTY_FIELD_ERROR);
+            return;
+        }
+
+        // get current date in the format "YYYYMMDD" and use it as key
+        Date currentTime = Calendar.getInstance().getTime();
+        String formattedDate = simpleDateFormat.format(currentTime);
+
+        // retrieve daily steps
+        int loadedSteps = historySharedPreferences.getInt(formattedDate, 0);
+        Log.i(getClass().getName(), "Loaded steps: " + Integer.toString(loadedSteps));
+
+        // retrieve new daily goal
+        int newDailyGoal = Integer.parseInt(goal);
+
+        // check if new daily goal is higher than steps already taken today
+        if (newDailyGoal < loadedSteps) {
+            Toast.makeText(SettingsActivity.this, "Debe especificar una meta mayor a la cantidad de pasos realizada en el día de hoy.", Toast.LENGTH_LONG).show();
+        } else {
+            SharedPreferences.Editor editor = settingsSharedPreferences.edit();
+            editor.putInt(formattedDate, newDailyGoal);
+            editor.apply();
+        }
+
+        // finish activity
+        finish();
     };
 
     private final SensorEventListener sensorEventListener = new SensorEventListener() {
@@ -100,27 +131,16 @@ public class SettingsActivity extends AppCompatActivity {
         public void onAccuracyChanged(Sensor sensor, int i) { }
     };
 
-    private void start() {
-        sensorManager.registerListener(sensorEventListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-    }
+    private void initializeUi() {
+        // get current date in the format "YYYYMMDD" and use it as key
+        Date currentTime = Calendar.getInstance().getTime();
+        String formattedDate = simpleDateFormat.format(currentTime);
 
-    private void stop() {
-        sensorManager.unregisterListener(sensorEventListener);
-    }
+        // retrieve current daily goal
+        int currentDailyGoal = settingsSharedPreferences.getInt(formattedDate, DEFAULT_DAILY_GOAL);
+        Log.i(getClass().getName(), "Loaded daily goal: " + Integer.toString(currentDailyGoal));
 
-    private int readPrefferenceInt(SharedPreferences sharedPref, String key, int defaultValue) {
-        if (sharedPref != null) {
-            return sharedPref.getInt(key, defaultValue);
-        }
-        return 0;
-    }
-
-    private void savePrefferenceInt(SharedPreferences sharedPref, String key, int value) {
-        if (sharedPref != null) {
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putInt(key, value);
-            editor.apply();
-        }
+        editTextGoal.setText(Integer.toString(currentDailyGoal));
     }
 
 }
