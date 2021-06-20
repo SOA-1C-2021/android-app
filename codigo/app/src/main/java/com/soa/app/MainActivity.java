@@ -37,7 +37,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     // shared preferences
     SharedPreferences historySharedPreferences = null;
+    SharedPreferences.Editor historySharedPreferencesEditor = null;
     SharedPreferences settingsSharedPreferences = null;
+    SharedPreferences.Editor settingsSharedPreferencesEditor = null;
 
     // sensor
     private SensorManager sensorManager = null;
@@ -73,7 +75,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         // instantiate shared preferences files
         historySharedPreferences = getSharedPreferences(getString(R.string.shared_preferences_history), Context.MODE_PRIVATE);
+        historySharedPreferencesEditor = historySharedPreferences.edit();
         settingsSharedPreferences = getSharedPreferences(getString(R.string.shared_preferences_settings), Context.MODE_PRIVATE);
+        settingsSharedPreferencesEditor = settingsSharedPreferences.edit();
 
         // add listeners
         settingsSharedPreferences.registerOnSharedPreferenceChangeListener(settingsSharedPreferencesListener);
@@ -85,13 +89,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
-    private SharedPreferences.OnSharedPreferenceChangeListener settingsSharedPreferencesListener = new SharedPreferences.OnSharedPreferenceChangeListener()
-    {
-        public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-            if (key.equals(getString(R.string.settings_step_goal_key))) {
-                int goal = prefs.getInt(getString(R.string.settings_step_goal_key), 100);
-                textGoalValue.setText(Integer.toString(goal));
-            }
+    private SharedPreferences.OnSharedPreferenceChangeListener settingsSharedPreferencesListener = (prefs, key) -> {
+        if (key.equals(getString(R.string.settings_step_goal_key))) {
+            int goal = prefs.getInt(getString(R.string.settings_step_goal_key), 100);
+            textGoalValue.setText(Integer.toString(goal));
         }
     };
 
@@ -135,20 +136,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onSensorChanged(SensorEvent sensorEvent) {
 
         int stepSensorValue = (int) sensorEvent.values[0];
-        Log.d(getClass().getName(), "stepSensorValue: " + Integer.toString(stepSensorValue));
+        Log.d(getClass().getName(), "stepSensorValue: " + stepSensorValue);
 
         // if the activity has just been created, store the current sensor count in memory
         // to subtract it from subsequent reads (since its value is relative to the last phone reboot)
         if (!counterInitialized) {
             // initialize counter
             totalStepsSinceReboot = stepSensorValue;
-            Log.d(getClass().getName(), "totalStepsSinceReboot: " + Integer.toString(totalStepsSinceReboot));
+            Log.d(getClass().getName(), "totalStepsSinceReboot: " + totalStepsSinceReboot);
             dailySteps = loadedSteps;
             counterInitialized = true;
         } else {
             // update counter
             dailySteps = stepSensorValue - totalStepsSinceReboot;
-            Log.d(getClass().getName(), "dailySteps: " + Integer.toString(dailySteps));
+            Log.d(getClass().getName(), "dailySteps: " + dailySteps);
         }
 
         // update ui
@@ -197,16 +198,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void saveSteps() {
-        SharedPreferences.Editor editor = historySharedPreferences.edit();
-
         // get current date in the format "YYYYMMDD" and use it as key
         Date currentTime = Calendar.getInstance().getTime();
         String formattedDate = simpleDateFormat.format(currentTime);
 
-        editor.putInt(formattedDate, dailySteps);
-        editor.apply();
+        historySharedPreferencesEditor.putInt(formattedDate, dailySteps);
+        historySharedPreferencesEditor.apply();
 
-        Log.i(getClass().getName(), "Saved steps: " + Integer.toString(dailySteps));
+        Log.i(getClass().getName(), "Saved steps: " + dailySteps);
     }
 
     private void loadDailyGoal() {
@@ -214,9 +213,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Date currentTime = Calendar.getInstance().getTime();
         String formattedDate = simpleDateFormat.format(currentTime);
 
-        // retrieve daily goal
-        dailyGoal = settingsSharedPreferences.getInt(formattedDate, DEFAULT_DAILY_GOAL);
-        Log.i(getClass().getName(), "Loaded daily goal: " + Integer.toString(dailyGoal));
+        // retrieve daily goal, if daily goal does not exist, create entry
+        if (settingsSharedPreferences.contains(formattedDate)) {
+            dailyGoal = settingsSharedPreferences.getInt(formattedDate, DEFAULT_DAILY_GOAL);
+            Log.i(getClass().getName(), "Loaded daily goal: " + dailyGoal);
+        } else {
+            settingsSharedPreferencesEditor.putInt(formattedDate, DEFAULT_DAILY_GOAL);
+            settingsSharedPreferencesEditor.apply();
+            Log.i(getClass().getName(), "Daily goal entry not found, created entry for today with default value");
+        }
 
     }
 
@@ -227,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         // retrieve daily steps
         loadedSteps = historySharedPreferences.getInt(formattedDate, 0);
-        Log.i(getClass().getName(), "Loaded steps: " + Integer.toString(loadedSteps));
+        Log.i(getClass().getName(), "Loaded steps: " + loadedSteps);
 
         if (dailySteps >= dailyGoal) circularProgressBar.setProgressBarColor(Color.GREEN);
 
