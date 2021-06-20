@@ -16,23 +16,28 @@
         android:theme="@style/Theme.App">
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/settings_activity_label" />
+            android:label="@string/settings_activity_label"
+            android:screenOrientation = "portrait"/>
         <activity
             android:name=".HistoryActivity"
-            android:label="@string/history_activity_label"/>
+            android:label="@string/history_activity_label"
+            android:screenOrientation = "portrait"/>
         <activity
             android:name=".MainActivity"
             android:label="@string/main_activity_label"
             android:screenOrientation = "portrait"/>
         <activity
             android:name=".RegisterActivity"
-            android:label="@string/register_activity_label" />
+            android:label="@string/register_activity_label"
+            android:screenOrientation = "portrait"/>
         <activity
             android:name=".LoginActivity"
-            android:label="@string/login_activity_label" />
+            android:label="@string/login_activity_label"
+            android:screenOrientation = "portrait"/>
         <activity
             android:name=".AuthActivity"
-            android:label="@string/auth_activity_label">
+            android:label="@string/auth_activity_label"
+            android:screenOrientation = "portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
