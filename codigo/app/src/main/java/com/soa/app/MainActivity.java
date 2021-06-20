@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     // event management
     private AsyncTask eventTask;
     private NetworkConnectivity networkConnectivity;
+    private boolean eventSent;
 
     // other
     SimpleDateFormat simpleDateFormat;
@@ -163,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         } else {
             // update counter
             dailySteps = stepSensorValue - totalStepsSinceReboot;
+            if (dailySteps >= dailyGoal && !eventSent) launchThread(); // send goal accomplished event to API
             Log.d(getClass().getName(), "dailySteps: " + dailySteps);
         }
 
@@ -271,6 +273,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void launchThread() {
+        eventSent = true;
         networkConnectivity.checkInternetConnection((isConnected) -> {
             if (isConnected) {
                 eventTask = new ThreadAsyncTask();
