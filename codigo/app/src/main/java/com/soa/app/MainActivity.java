@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         settingsSharedPreferences.registerOnSharedPreferenceChangeListener(settingsSharedPreferencesListener);
 
         // perform initialization actions
+        counterInitialized = false;
         loadDailyGoal();
         loadSteps();
         initializeUi();
@@ -257,19 +258,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         loadedSteps = historySharedPreferences.getInt(formattedDate, 0);
         Log.i(getClass().getName(), "Loaded steps: " + loadedSteps);
 
-        if (dailySteps >= dailyGoal) circularProgressBar.setProgressBarColor(Color.GREEN);
-
+        dailySteps = loadedSteps;
     }
 
     private void initializeUi() {
         textGoalValue.setText(Integer.toString(dailyGoal));
         textProgressValue.setText(Integer.toString(dailySteps));
         textPercentageValue.setText(getPercentage(dailySteps, dailyGoal) + " %");
+
         circularProgressBar.setRoundBorder(true);
         circularProgressBar.setProgressBarWidth(PROGRESS_BAR_WIDTH);
         circularProgressBar.setBackgroundProgressBarWidth(PROGRESS_BAR_WIDTH);
         circularProgressBar.setBackgroundProgressBarColor(R.color.purple_500);
-        circularProgressBar.setProgressBarColor(R.color.purple_700);
+
+        if (loadedSteps >= dailyGoal) circularProgressBar.setProgressBarColor(Color.GREEN);
+        else circularProgressBar.setProgressBarColor(R.color.purple_700);
+
         circularProgressBar.setProgressMax(dailyGoal);
     }
 
