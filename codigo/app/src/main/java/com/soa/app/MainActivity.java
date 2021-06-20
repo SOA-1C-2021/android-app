@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     // sensor
     private SensorManager sensorManager = null;
+    Sensor stepSensor = null;
     private boolean sensorActive = false;
 
     // step management
@@ -67,9 +68,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         textGoalValue = findViewById(R.id.text_goal_value);
         textPercentageValue = findViewById(R.id.text_percentage_value);
 
-        // instantiate sensor manager
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-
         // instantiate date formatter
         simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
@@ -87,6 +85,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         loadSteps();
         initializeUi();
 
+        // instantiate sensor manager
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        if (stepSensor == null) {
+            Toast.makeText(MainActivity.this, "El dispositivo no posee el sensor necesario para la aplicación", Toast.LENGTH_LONG).show();
+        }
     }
 
     private SharedPreferences.OnSharedPreferenceChangeListener settingsSharedPreferencesListener = (prefs, key) -> {
@@ -99,15 +103,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onResume() {
         super.onResume();
-
-        Sensor stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-
-        if (stepSensor == null) {
-            Toast.makeText(MainActivity.this, "El dispositivo no posee el sensor necesario para la aplicación", Toast.LENGTH_LONG).show();
-        } else {
+        if (stepSensor != null) {
             sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_UI);
         }
-
         // perform initialization actions
         loadDailyGoal();
         loadSteps();
@@ -117,6 +115,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onPause() {
         super.onPause();
+        if (stepSensor != null) {
+            sensorManager.unregisterListener(this, stepSensor);
+        }
         saveSteps();
     }
 
