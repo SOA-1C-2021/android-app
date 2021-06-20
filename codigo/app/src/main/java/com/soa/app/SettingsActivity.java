@@ -30,10 +30,11 @@ public class SettingsActivity extends AppCompatActivity {
     // Shared Preferences
     SharedPreferences historySharedPreferences = null;
     SharedPreferences settingsSharedPreferences = null;
+    SharedPreferences.Editor settingsSharedPreferencesEditor = null;
 
     // Sensor
-    SensorManager sensorManager;
-    Sensor sensor;
+    SensorManager sensorManager = null;
+    Sensor sensor = null;
 
     // other
     SimpleDateFormat simpleDateFormat = null;
@@ -59,6 +60,7 @@ public class SettingsActivity extends AppCompatActivity {
         // instantiate shared preferences files
         historySharedPreferences = getSharedPreferences(getString(R.string.shared_preferences_history), Context.MODE_PRIVATE);
         settingsSharedPreferences = getSharedPreferences(getString(R.string.shared_preferences_settings), Context.MODE_PRIVATE);
+        settingsSharedPreferencesEditor = settingsSharedPreferences.edit();
 
         // add listeners
         btnSaveSettings.setOnClickListener(buttonClickListener);
@@ -96,7 +98,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         // retrieve daily steps
         int loadedSteps = historySharedPreferences.getInt(formattedDate, 0);
-        Log.i(getClass().getName(), "Loaded steps: " + Integer.toString(loadedSteps));
+        Log.i(getClass().getName(), "Loaded steps: " + loadedSteps);
 
         // retrieve new daily goal
         int newDailyGoal = Integer.parseInt(goal);
@@ -105,9 +107,8 @@ public class SettingsActivity extends AppCompatActivity {
         if (newDailyGoal < loadedSteps) {
             Toast.makeText(SettingsActivity.this, "Debe especificar una meta mayor a la cantidad de pasos realizada en el día de hoy.", Toast.LENGTH_LONG).show();
         } else {
-            SharedPreferences.Editor editor = settingsSharedPreferences.edit();
-            editor.putInt(formattedDate, newDailyGoal);
-            editor.apply();
+            settingsSharedPreferencesEditor.putInt(formattedDate, newDailyGoal);
+            settingsSharedPreferencesEditor.apply();
         }
 
         // finish activity
@@ -138,7 +139,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         // retrieve current daily goal
         int currentDailyGoal = settingsSharedPreferences.getInt(formattedDate, DEFAULT_DAILY_GOAL);
-        Log.i(getClass().getName(), "Loaded daily goal: " + Integer.toString(currentDailyGoal));
+        Log.i(getClass().getName(), "Loaded daily goal: " + currentDailyGoal);
 
         editTextGoal.setText(Integer.toString(currentDailyGoal));
     }
