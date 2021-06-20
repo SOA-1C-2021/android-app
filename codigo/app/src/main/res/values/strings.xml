@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">Activate</string>
-    <string name="auth_name">Inicio</string>
-    <string name="login_name">Ingresar</string>
-    <string name="register_name">Crear usuario</string>
+    <string name="auth_activity_label">Autenticación</string>
+    <string name="login_activity_label">Ingreso</string>
+    <string name="register_activity_label">Creación de usuario</string>
+    <string name="main_activity_label">Principal</string>
+    <string name="settings_activity_label">Configuración</string>
+    <string name="history_activity_label">Historial</string>
     <string name="text_welcome">¡Bienvenido! Por favor, ingrese el patrón de desbloqueo para comenzar.</string>
     <string name="edit_text_email_login">Usuario (email)</string>
     <string name="edit_text_password">Contraseña</string>
@@ -19,12 +22,12 @@
     <string name="edit_text_group">Grupo</string>
     <string name="env">TEST</string>
     <string name="text_goal_label">Mi meta de hoy</string>
-    <string name="text_progress_label">Porcentaje completado</string>
-    <string name="settings">Configuración</string>
-    <string name="history">Historial</string>
+    <string name="text_progress_label">Pasos realizados</string>
+    <string name="text_percentage_label">Porcentaje completado</string>
     <string name="text_view_goal">Mi meta diaria</string>
     <string name="edit_text_goal_hint">Escribe un numero</string>
     <string name="settings_step_goal_key">GOAL</string>
-    <string name="settings_file_key">com.soa.app.settings</string>
     <string name="settings_save">Guardar</string>
+    <string name="shared_preferences_history">com.soa.app.history</string>
+    <string name="shared_preferences_settings">com.soa.app.settings</string>
 </resources>

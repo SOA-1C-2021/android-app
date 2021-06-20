@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
     <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="true" />
 
     <application
@@ -15,20 +16,23 @@
         android:theme="@style/Theme.App">
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/settings" />
+            android:label="@string/settings_activity_label" />
         <activity
             android:name=".HistoryActivity"
-            android:label="@string/history"/>
-        <activity android:name=".MainActivity" />
+            android:label="@string/history_activity_label"/>
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/main_activity_label"
+            android:screenOrientation = "portrait"/>
         <activity
             android:name=".RegisterActivity"
-            android:label="@string/register_name" />
+            android:label="@string/register_activity_label" />
         <activity
             android:name=".LoginActivity"
-            android:label="@string/login_name" />
+            android:label="@string/login_activity_label" />
         <activity
             android:name=".AuthActivity"
-            android:label="@string/auth_name">
+            android:label="@string/auth_activity_label">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
