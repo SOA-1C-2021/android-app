@@ -96,9 +96,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         settingsSharedPreferences = getSharedPreferences(getString(R.string.shared_preferences_settings), Context.MODE_PRIVATE);
         settingsSharedPreferencesEditor = settingsSharedPreferences.edit();
 
-        // add listeners
-        settingsSharedPreferences.registerOnSharedPreferenceChangeListener(settingsSharedPreferencesListener);
-
         // perform initialization actions
         counterInitialized = false;
         loadDailyGoal();
@@ -112,13 +109,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             Toast.makeText(MainActivity.this, "El dispositivo no posee el sensor necesario para la aplicación", Toast.LENGTH_LONG).show();
         }
     }
-
-    private SharedPreferences.OnSharedPreferenceChangeListener settingsSharedPreferencesListener = (prefs, key) -> {
-        if (key.equals(getString(R.string.settings_step_goal_key))) {
-            int goal = prefs.getInt(getString(R.string.settings_step_goal_key), 100);
-            textGoalValue.setText(Integer.toString(goal));
-        }
-    };
 
     @Override
     protected void onResume() {
@@ -177,10 +167,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
 
         // update ui
-        if (dailySteps >= dailyGoal) circularProgressBar.setProgressBarColor(Color.GREEN);
-        circularProgressBar.setProgressWithAnimation(dailySteps);
-        textProgressValue.setText(Integer.toString(dailySteps));
-        textPercentageValue.setText(getPercentage(dailySteps, dailyGoal) + " %");
+        initializeUi();
 
     }
 
