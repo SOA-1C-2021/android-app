@@ -55,7 +55,7 @@ public class LoginActivity extends AppCompatActivity {
         networkConnectivity = new NetworkConnectivity(AppExecutors.getInstance(), this);
 
         // instantiate shared preferences files
-        tokenSharedPreferences = getSharedPreferences(getString(R.string.shared_preferences_history), Context.MODE_PRIVATE);
+        tokenSharedPreferences = getSharedPreferences(getString(R.string.shared_preferences_token), Context.MODE_PRIVATE);
         tokenSharedPreferencesEditor = tokenSharedPreferences.edit();
 
     }

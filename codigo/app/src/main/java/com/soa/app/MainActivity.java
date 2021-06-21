@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         historySharedPreferencesEditor = historySharedPreferences.edit();
         settingsSharedPreferences = getSharedPreferences(getString(R.string.shared_preferences_settings), Context.MODE_PRIVATE);
         settingsSharedPreferencesEditor = settingsSharedPreferences.edit();
-        tokenSharedPreferences = getSharedPreferences(getString(R.string.shared_preferences_history), Context.MODE_PRIVATE);
+        tokenSharedPreferences = getSharedPreferences(getString(R.string.shared_preferences_token), Context.MODE_PRIVATE);
         tokenSharedPreferencesEditor = tokenSharedPreferences.edit();
 
         // add listeners
