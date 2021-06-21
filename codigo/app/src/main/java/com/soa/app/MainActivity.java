@@ -107,6 +107,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         historySharedPreferencesEditor = historySharedPreferences.edit();
         settingsSharedPreferences = getSharedPreferences(getString(R.string.shared_preferences_settings), Context.MODE_PRIVATE);
         settingsSharedPreferencesEditor = settingsSharedPreferences.edit();
+        tokenSharedPreferences = getSharedPreferences(getString(R.string.shared_preferences_history), Context.MODE_PRIVATE);
+        tokenSharedPreferencesEditor = tokenSharedPreferences.edit();
+
+        // add listeners
+        settingsSharedPreferences.registerOnSharedPreferenceChangeListener(settingsSharedPreferencesListener);
 
         // perform initialization actions
         counterInitialized = false;
@@ -121,6 +126,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             Toast.makeText(MainActivity.this, "El dispositivo no posee el sensor necesario para la aplicación", Toast.LENGTH_LONG).show();
         }
     }
+
+    private SharedPreferences.OnSharedPreferenceChangeListener settingsSharedPreferencesListener = (prefs, key) -> {
+        // get current date in the format "YYYYMMDD" and use it as key
+        Date currentTime = Calendar.getInstance().getTime();
+        String formattedDate = simpleDateFormat.format(currentTime);
+
+        if (key.equals(formattedDate)) {
+            eventSent = false;
+        }
+    };
 
     @Override
     protected void onResume() {
@@ -271,10 +286,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         circularProgressBar.setBackgroundProgressBarWidth(PROGRESS_BAR_WIDTH);
         circularProgressBar.setBackgroundProgressBarColor(R.color.purple_500);
 
-        if (loadedSteps >= dailyGoal) circularProgressBar.setProgressBarColor(Color.GREEN);
+        if (dailySteps >= dailyGoal) circularProgressBar.setProgressBarColor(Color.GREEN);
         else circularProgressBar.setProgressBarColor(R.color.purple_700);
 
         circularProgressBar.setProgressMax(dailyGoal);
+        circularProgressBar.setProgressWithAnimation(dailySteps);
     }
 
     private String getPercentage(int dailySteps, int dailyGoal) {
