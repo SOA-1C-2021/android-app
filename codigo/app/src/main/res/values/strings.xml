@@ -20,7 +20,7 @@
     <string name="edit_text_new_password">Contraseña</string>
     <string name="edit_text_commission">Comisión</string>
     <string name="edit_text_group">Grupo</string>
-    <string name="env">TEST</string>
+    <string name="env">PROD</string>
     <string name="text_goal_label">Mi meta de hoy</string>
     <string name="text_progress_label">Pasos realizados</string>
     <string name="text_percentage_label">Porcentaje completado</string>
