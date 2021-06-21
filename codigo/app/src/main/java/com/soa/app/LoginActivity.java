@@ -2,7 +2,9 @@ package com.soa.app;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -30,6 +32,10 @@ public class LoginActivity extends AppCompatActivity {
 
     private NetworkConnectivity networkConnectivity;
 
+    // shared preferences
+    SharedPreferences tokenSharedPreferences = null;
+    SharedPreferences.Editor tokenSharedPreferencesEditor = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +53,10 @@ public class LoginActivity extends AppCompatActivity {
 
         // instantiate network connectivity checker class
         networkConnectivity = new NetworkConnectivity(AppExecutors.getInstance(), this);
+
+        // instantiate shared preferences files
+        tokenSharedPreferences = getSharedPreferences(getString(R.string.shared_preferences_history), Context.MODE_PRIVATE);
+        tokenSharedPreferencesEditor = tokenSharedPreferences.edit();
 
     }
 
@@ -122,7 +132,9 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<LoginResponse> request, Response<LoginResponse> response) {
 
                 if (response.isSuccessful()) {
-                    Toast.makeText(LoginActivity.this, "Login exitoso", Toast.LENGTH_SHORT).show();
+                    tokenSharedPreferencesEditor.putString("token", response.body().getToken());
+                    tokenSharedPreferencesEditor.putString("token_refresh", response.body().getTokenRefresh());
+                    tokenSharedPreferencesEditor.apply();
                     Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(mainActivityIntent);
                 } else {

@@ -21,8 +21,11 @@ import android.view.MenuItem;
 
 import com.google.gson.JsonObject;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
+import com.soa.app.models.RefreshResponse;
 import com.soa.app.services.AppExecutors;
 import com.soa.app.services.NetworkConnectivity;
+import com.soa.app.services.UNLaMSOAAPIService;
+import com.soa.app.services.UNLaMSOAAPIServiceBuilder;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,8 +38,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -52,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     SharedPreferences.Editor historySharedPreferencesEditor = null;
     SharedPreferences settingsSharedPreferences = null;
     SharedPreferences.Editor settingsSharedPreferencesEditor = null;
+    SharedPreferences tokenSharedPreferences = null;
+    SharedPreferences.Editor tokenSharedPreferencesEditor = null;
 
     // sensor
     private SensorManager sensorManager = null;
@@ -70,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private AsyncTask eventTask;
     private NetworkConnectivity networkConnectivity;
     private boolean eventSent;
+    private boolean tokenRefreshed;
 
     // other
     SimpleDateFormat simpleDateFormat;
@@ -326,15 +337,45 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             int responseCode = (int)values[0];
             if (responseCode == HTTP_OK || responseCode == HTTP_CREATED) {
                 Toast.makeText(MainActivity.this, "Meta completada!! Tu logro se ha enviado al servidor!!", Toast.LENGTH_LONG).show();
+            } else if (responseCode == HTTP_UNAUTHORIZED) {
+                Toast.makeText(MainActivity.this, "Token vencido, ejecutando request para obtener uno nuevo...", Toast.LENGTH_LONG).show();
+                executeRefreshTokenRequest();
             } else {
                 Toast.makeText(MainActivity.this, "Meta completada!! Tu logro no pudo enviarse al servidor :(", Toast.LENGTH_LONG).show();
             }
         }
 
         private String getToken() {
-            // TODO: completar con el token real
-            return "FAKE-TOKEN";
+            return tokenSharedPreferences.getString("token", "");
         }
+    }
+
+    private void executeRefreshTokenRequest() {
+        UNLaMSOAAPIService service = UNLaMSOAAPIServiceBuilder.buildService(UNLaMSOAAPIService.class);
+        Call<RefreshResponse> call = service.refresh();
+
+        call.enqueue(new Callback<RefreshResponse>() {
+
+            @Override
+            public void onResponse(Call<RefreshResponse> request, Response<RefreshResponse> response) {
+
+                if (response.isSuccessful()) {
+                    tokenSharedPreferencesEditor.putString("token", response.body().getToken());
+                    tokenSharedPreferencesEditor.putString("token_refresh", response.body().getTokenRefresh());
+                    tokenSharedPreferencesEditor.apply();
+                    Toast.makeText(MainActivity.this, "Token actualizado" ,Toast.LENGTH_LONG).show();
+                    launchThread();
+                } else {
+                    Toast.makeText(MainActivity.this, "Error al refrescar token" ,Toast.LENGTH_LONG).show();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<RefreshResponse> request, Throwable t) {
+                Toast.makeText(MainActivity.this, "Error al refrescar token", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
 }
